@@ -31,22 +31,32 @@ interface Food {
 const Favorites: React.FC = () => {
   const [favorites, setFavorites] = useState<Food[]>([]);
 
-  const loadFavorites = useCallback(async () => {
+  const loadFavorites = useCallback(async (isActive: boolean) => {
     const response = await api.get('favorites');
 
-    setFavorites(response.data);
-    console.log('carregou favoritos');
+    if (isActive) setFavorites(response.data);
   }, []);
 
   useEffect(() => {
-    loadFavorites();
-  }, [loadFavorites]);
+    async function loadFav(): Promise<void> {
+      const response = await api.get('favorites');
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     loadFavorites();
-  //   }, [loadFavorites]),
-  // );
+      setFavorites(response.data);
+      console.log('carregou favoritos');
+    }
+    loadFav();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+      loadFavorites(isActive);
+
+      return () => {
+        isActive = false;
+      };
+    }, [loadFavorites]),
+  );
 
   return (
     <Container>
