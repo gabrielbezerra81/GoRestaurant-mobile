@@ -35,6 +35,7 @@ interface Food {
   price: number;
   thumbnail_url: string;
   formattedPrice: string;
+  category: number;
 }
 
 interface Category {
@@ -54,27 +55,40 @@ const Dashboard: React.FC = () => {
   const navigation = useNavigation();
 
   async function handleNavigate(id: number): Promise<void> {
-    // Navigate do ProductDetails page
+    navigation.navigate('FoodDetails', { id });
   }
 
   useEffect(() => {
     async function loadFoods(): Promise<void> {
-      // Load Foods from API
-    }
+      const queryParams = {
+        category_like: selectedCategory || undefined,
+        name_like: searchValue || undefined,
+      };
 
+      const response = await api.get<Food[]>('foods', {
+        params: queryParams,
+      });
+
+      setFoods(response.data);
+    }
     loadFoods();
   }, [selectedCategory, searchValue]);
 
   useEffect(() => {
     async function loadCategories(): Promise<void> {
-      // Load categories from API
+      const response = await api.get('categories');
+
+      setCategories(response.data);
     }
 
     loadCategories();
   }, []);
 
   function handleSelectCategory(id: number): void {
-    // Select / deselect category
+    setSelectedCategory(oldID => {
+      if (oldID === id) return undefined;
+      return id;
+    });
   }
 
   return (
@@ -134,7 +148,7 @@ const Dashboard: React.FC = () => {
               >
                 <FoodImageContainer>
                   <Image
-                    style={{ width: 88, height: 88 }}
+                    style={{ width: 88, height: 88, borderRadius: 44 }}
                     source={{ uri: food.thumbnail_url }}
                   />
                 </FoodImageContainer>

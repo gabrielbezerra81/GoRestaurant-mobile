@@ -70,7 +70,7 @@ export const FoodPricing = styled.Text`
   font-size: 24px;
   line-height: 28px;
   color: #6c6c80;
-  margin-top: 8px;
+  margin-top: 16px;
   font-weight: 600;
 `;
 
